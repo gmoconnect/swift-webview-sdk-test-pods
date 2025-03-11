@@ -1,0 +1,4 @@
+framework module Smaad_Swift_SDK {
+  header "Smaad_Swift_SDK-Swift.h"
+  requires objc
+}
