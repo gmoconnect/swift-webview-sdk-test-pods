@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "co-swift-sdk"
-  spec.version      = "0.0.2"
+  spec.version      = "0.0.3"
   spec.summary      = "A short description of co-swift-sdk"
 
   # This description is used to generate tags and improve search results.
@@ -135,6 +135,6 @@ Pod::Spec.new do |spec|
   # spec.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
   # spec.dependency "JSONKit", "~> 1.4"
   # spec.vendored_frameworks = 'Smaad_Swift_SDK.framework'
-  spec.platform     = :ios, '13.0'
+  spec.platform     = :ios, '17.0'
   spec.requires_arc = true
 end
