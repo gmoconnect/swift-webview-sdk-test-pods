@@ -25,7 +25,9 @@ open class SmaadWKWebView: WKWebView, WKScriptMessageHandler, WKNavigationDelega
         let urlString = "\(baseUrl)\(zoneId)?u=\(userParameter)"
         
         guard let url = URL(string: urlString) else {
-            print("Invalid URL")
+            let errorMessage = "Invalid URL: \(urlString)"
+            print(errorMessage)
+            smaadDelegate?.webViewDidFailProvisionalError(errorMessage, failingUrl: urlString)
             return
         }
         
@@ -46,6 +48,13 @@ open class SmaadWKWebView: WKWebView, WKScriptMessageHandler, WKNavigationDelega
         initialSmaadWebView()
     }
     
+    deinit {
+        // メッセージハンドラの登録解除
+        configuration.userContentController.removeScriptMessageHandler(forName: Constants.smaadMessageHandler)
+        configuration.userContentController.removeScriptMessageHandler(forName: Constants.webViewClosedHandler)
+        configuration.userContentController.removeScriptMessageHandler(forName: Constants.launchURLHandler)
+    }
+    
     private func initialSmaadWebView(){
         addMessageHandler()
         updateUserAgent()
@@ -58,11 +67,10 @@ open class SmaadWKWebView: WKWebView, WKScriptMessageHandler, WKNavigationDelega
                          injectionTime: WKUserScriptInjectionTime.atDocumentStart,
                          forMainFrameOnly: false))
         // webViewClosed メッセージハンドラの追加
-        configuration.userContentController.removeScriptMessageHandler(forName: "webViewClosed")
-        configuration.userContentController.add(self, name: "webViewClosed")
-        configuration.userContentController.removeScriptMessageHandler(forName: "launchURL")
-        configuration.userContentController.add(self, name: "launchURL")
-        
+        configuration.userContentController.removeScriptMessageHandler(forName: Constants.webViewClosedHandler)
+        configuration.userContentController.add(self, name: Constants.webViewClosedHandler)
+        configuration.userContentController.removeScriptMessageHandler(forName: Constants.launchURLHandler)
+        configuration.userContentController.add(self, name: Constants.launchURLHandler)
     }
     
     internal func updateUserAgent() {
@@ -74,17 +82,14 @@ open class SmaadWKWebView: WKWebView, WKScriptMessageHandler, WKNavigationDelega
     }
     
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        if message.name == "webViewClosed" {
+        if message.name == Constants.webViewClosedHandler {
             smaadDelegate?.onClosedWebView()
         }
-        else if message.name == "launchURL"{
+        else if message.name == Constants.launchURLHandler {
             if let urlString = message.body as? String,
                 let url = URL(string: urlString) {
-                if #available(iOS 10.0, *) {
-                    UIApplication.shared.open(url)
-                } else {
-                    UIApplication.shared.openURL(url)
-                }
+                // iOS 13以上をサポートしているので、新しいAPIを使用
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
             }
         }
     }

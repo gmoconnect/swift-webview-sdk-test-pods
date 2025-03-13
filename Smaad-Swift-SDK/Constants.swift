@@ -10,4 +10,8 @@ internal class Constants {
     static let smaadMessageHandler = "smaadWebSDK"
     static let customUserAgent = " SmaadWebViewSDK/" + sdkVersion
     static let navigatorUserAgent = "navigator.userAgent"
+    
+    // メッセージハンドラ名
+    static let webViewClosedHandler = "webViewClosed"
+    static let launchURLHandler = "launchURL"
 }
